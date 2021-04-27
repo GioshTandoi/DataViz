@@ -7,6 +7,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
+import plotly.graph_objects as go
 
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -84,6 +85,21 @@ app.layout = html.Div(
                                         ),
                                     ],
                                 ),
+                                html.Div(
+                                    [
+                                        dcc.Dropdown(
+                                            id='drop-down-2',
+                                            options=[
+                                                {'label': 'School Closing', 'value': 'c1_school_closing'},
+                                                {'label': 'Work Place Closing', 'value': 'c2_workplace_closing'},
+                                                {'label': 'Public Events Cancelled', 'value': 'c3_cancel_public_events'}
+                                                
+                                            ],
+                                            value=['c1_school_closing'],
+                                            multi=True
+                                        )
+                                    ]
+                                )
 
                              
                             ],
@@ -101,11 +117,12 @@ app.layout = html.Div(
 )
 
 @app.callback(
-    Output("g1", "figure"), Input('drop-down-1', 'value')
+    Output("g1", "figure"), Input('drop-down-1', 'value'), Input('drop-down-2', 'value')
 )
-def main_graph(series_name):
+def main_graph(series_name, measures):
 
     df = daily_data
+
     
     trace = dict(
         type="scatter",
@@ -121,9 +138,15 @@ def main_graph(series_name):
         paper_bgcolor=app_color["graph_bg"],
         font={"color": "#fff"},
         height=700,
+        xaxis =  {'showgrid': False},
+        yaxis = {'showgrid': False}
     )
-
-    return dict(data=[trace], layout=layout)
+    fig = go.Figure(data=[trace], layout=layout)
+    fig.add_vrect(x0="2020-03-15", x1="2020-05-10",
+        annotation_text="decline", annotation_position="top left",
+        annotation=dict(font_size=20, font_family="Times New Roman"),
+        fillcolor="yellow", opacity=0.25, line_width=0)
+    return fig
 
 if __name__ == "__main__":
     app.run_server(debug=True)
