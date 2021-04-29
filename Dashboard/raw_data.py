@@ -26,8 +26,8 @@ for key, file in files.items():
     print(f"loading... {file}")
     raw_data[key] = pd.read_csv(data_folder / file, sep=";")
 
-pd.to_datetime(
+
+raw_data['cases_national']['Date_statistics'] = pd.to_datetime(
     raw_data['cases_national']['Date_statistics'],
-    format='%d/%m/%y',
-    errors='coerce'
+    format='%d/%m/%Y', exact = False,
     )
