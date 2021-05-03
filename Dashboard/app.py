@@ -15,7 +15,10 @@ from dash.dependencies import Input, Output, State
 
 MEASURES_COLORS = {'c1_school_closing': '#b3c3dd', 'c2_workplace_closing': '#ddb3c3', 'c3_cancel_public_events': '#c3ddb3'}
 
-daily_data = pd.read_csv('daily_data.csv', sep = ',')
+MEASURES_NAMES = {'c1_school_closing': 'School Closing', 'c2_workplace_closing':'Workplace Closing', 'c3_cancel_public_events': 'Public Events Cancelled' }
+
+daily_data = pd.read_csv('daily_data.csv', sep=',')
+behaviour_data = pd.read_csv('behaviour_data.csv', sep=',')
 
 app = dash.Dash(
     __name__,
@@ -28,6 +31,7 @@ app_color = {"graph_bg": "#082255", "graph_line": "#007ACE"}
 
 app.layout = html.Div(
     [
+        # Header
         html.Div(
             [
                 html.Div(
@@ -43,8 +47,10 @@ app.layout = html.Div(
             ],
             className="app__header"
         ),
+        # Content 1
         html.Div(
             [
+                # Series Graph
                 html.Div(
                     [
                         html.Div(
@@ -63,14 +69,15 @@ app.layout = html.Div(
                     ],
                     className="two-thirds column wind__speed__container",
                 ),
+                # Selection box
                 html.Div(
                     [
-                        # selection box
+                        
                         html.Div(
                             [
                                 html.Div(
                                     [
-                                        html.H6(
+                                        html.H5(
                                             "SELECT DATA",
                                             className="graph__title",
                                         )
@@ -78,6 +85,10 @@ app.layout = html.Div(
                                 ),
                                 html.Div(
                                     [
+                                        html.H6(
+                                            "Series 1:",
+                                            className="graph__title",
+                                        ),
                                         dcc.Dropdown(
                                             id='drop-down-1',
                                             options=[
@@ -89,16 +100,34 @@ app.layout = html.Div(
                                 ),
                                 html.Div(
                                     [
+                                        html.H6(
+                                            "Series 2:",
+                                            className="graph__title",
+                                        ),
                                         dcc.Dropdown(
                                             id='drop-down-2',
                                             options=[
-                                                {'label': 'School Closing', 'value': 'c1_school_closing'},
-                                                {'label': 'Work Place Closing', 'value': 'c2_workplace_closing'},
+                                                {'label': 'New Cases', 'value': "Number of new cases"},
+                                            ],
+                                            value="Number of new cases"
+                                        ),
+                                    ],
+                                ),
+                                html.Div(
+                                    [
+                                        html.H6(
+                                            "Measure:",
+                                            className="graph__title",
+                                        ),
+                                        dcc.Dropdown(
+                                            id='drop-down-3',
+                                            options=[
+                                                {'label': 'School Closing at all Levels', 'value': 'c1_school_closing'},
+                                                {'label': 'Closing of all-but-essential Workplaces', 'value': 'c2_workplace_closing'},
                                                 {'label': 'Public Events Cancelled', 'value': 'c3_cancel_public_events'}
                                                 
                                             ],
-                                            value=['c1_school_closing'],
-                                            multi=True
+                                            value='c1_school_closing'
                                         )
                                     ]
                                 )
@@ -113,34 +142,87 @@ app.layout = html.Div(
 
             ],
             className="app__content",
-        )
+        ),
+        # Content 2
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.Div(
+                            [html.H6("Measures compliance and worry about COVID", className="graph__title")]
+                        ),
+                        dcc.Graph(
+                            id="g2",
+                            figure=dict(
+                                layout=dict(
+                                    plot_bgcolor=app_color["graph_bg"],
+                                    paper_bgcolor=app_color["graph_bg"],
+                                )
+                            ),
+                        ),
+
+                ],
+                className="two-thirds column wind__speed__container",
+            ),
+            html.Div(
+                    [
+                        # selection box
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.H5(
+                                            "SELECT BEHAVIOUR",
+                                            className="graph__title",
+                                        )
+                                    ]
+                                ),
+                                html.Div(
+                                    [
+                                        html.H6(
+                                            "Measure:",
+                                            className="graph__title",
+                                        ),
+                                        dcc.Dropdown(
+                                            id='drop-down-4',
+                                            options=[
+                                                {   'label': 'Stay Home', 'value': "Bij_klachten_blijf_thuis"},
+                                                    {'label': 'Keep 1.5m Distance', 'value': "Houd_1_5m_afstand"},
+                                            ],
+                                            value="Bij_klachten_blijf_thuis"
+                                        ),
+                                    ],
+                                ),
+                            ],
+                            className="graph__container first",
+                        ),
+                    ],
+                    className="one-third column histogram__direction",
+                )
+            ],
+            className="app__content"),
     ],
     className="app__container"
 )
 
 
-
 @app.callback(
-    Output("g1", "figure"), Input('drop-down-1', 'value'), Input('drop-down-2', 'value')
+    Output("g1", "figure"), Input('drop-down-1', 'value'), Input('drop-down-3', 'value')
 )
-def main_graph(series_name, measures):
+def main_graph(series_name, measure):
 
     df = daily_data
     measures_dates = get_measure_dates_dict(daily_data)
-
     areas_dicts = []
-
-    for measure in measures:
-        for i in range(int(len(measures_dates[measure]) / 2)):
-            this_dates = [str(measures_dates[measure][i + i]), str(measures_dates[measure][i + i + 1])]
-            areas_dicts.append(get_plot_area_dict(this_dates, measure, MEASURES_COLORS[measure]))
+    for i in range(int(len(measures_dates[measure]) / 2)):
+        this_dates = [str(measures_dates[measure][i + i]), str(measures_dates[measure][i + i + 1])]
+        areas_dicts.append(get_plot_area_dict(this_dates, measure, MEASURES_COLORS[measure]))
 
     trace = dict(
         type="scatter",
         y=df[series_name],
         x=df['Date_statistics'],
         line={"color": "#42C4F7"},
-        hoverinfo="skip",
         mode="lines",
     )
 
@@ -168,15 +250,57 @@ def main_graph(series_name, measures):
     return fig
 
 
+@app.callback(
+    Output("g2", "figure"), Input('drop-down-4', 'value')
+)
+def behaviour_plot(behaviour):
+    df = behaviour_data.loc[lambda d: d.Indicator == behaviour].sort_values('Date_of_measurement')
+
+    fig = go.Figure()
+
+    trace1 = dict(
+        type="scatter",
+        y=df['Normalised_Value'],
+        x=df['Date_of_measurement'],
+        #line={"color": "#42C4F7"},
+        mode="markers",
+    )
+
+    trace2 = dict(
+        type="scatter",
+        y=df['Normalised_Value'],
+        x=df['Date_of_measurement'],
+        #line={"color": "#42C4F7"},
+        line = dict(width=2, dash='dot'),
+    )
+
+    layout = dict(
+        plot_bgcolor=app_color["graph_bg"],
+        paper_bgcolor=app_color["graph_bg"],
+        font={"color": "#fff"},
+        height=400,
+        xaxis =  {'showgrid': False},
+        yaxis={'showgrid': False},
+        showlegend=False,
+        )
+
+    fig = go.Figure(data=[trace1, trace2], layout=layout)
+
+    fig.update_xaxes(range=[daily_data.loc[0, 'Date_statistics'], daily_data.reset_index(drop=True).loc[len(daily_data)-1, 'Date_statistics']])
+
+    fig.update_traces(marker_line_width=2, marker_size=11)
+
+    return fig
+
 
 def get_plot_area_dict(dates, measure, color):
     return dict(
         x0=dates[0],
         x1=dates[1],
-        annotation_text=measure,
+        annotation_text=MEASURES_NAMES[measure],
         fillcolor=color,
         annotation_position="top left",
-        annotation=dict(font_size=20,font_family="Times New Roman"),
+        annotation=dict(font_size=18,font_family="Helvetica"),
         opacity=0.25,
         line_width=0
     )
