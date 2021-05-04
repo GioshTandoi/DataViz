@@ -1,6 +1,6 @@
 from typing import List, Dict
 import pandas as pd
-from lib.raw_data import raw_data
+from utils.raw_data import raw_data
 
 
 MIN_DATE = '2020-01-01'
