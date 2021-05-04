@@ -4,7 +4,7 @@ processing steps.
 from pathlib import Path
 import pandas as pd
 
-data_folder = Path("Data")
+data_folder = Path("data")
 
 files = {
     "aggregated_cases_municipality": "COVID-19_aantallen_gemeente_cumulatief.csv",
