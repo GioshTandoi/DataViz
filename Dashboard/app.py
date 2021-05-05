@@ -15,7 +15,29 @@ from dash.dependencies import Input, Output, State
 
 
 # Declare Constants
-MEASURES_COLORS = {'c1_school_closing': '#b3c3dd', 'c2_workplace_closing': '#ddb3c3', 'c3_cancel_public_events': '#c3ddb3'}
+MEASURES_COLORS = {
+    "c1_school_closing": {1: "#bbc9e0", 2: "#cad5e7", 3: "#d9e1ee"},
+    "c2_workplace_closing": {1: "#bbc9e0", 2: "#cad5e7", 3: "#d9e1ee"},
+    "c3_cancel_public_events": {1: "#bbc9e0", 2: "#cad5e7"},
+
+}
+MEASURES = [
+    "c1_school_closing",
+    "c2_workplace_closing",
+    "c3_cancel_public_events",
+    "c4_restrictions_on_gatherings",
+    "c5_close_public_transport",
+    "c6_stay_at_home_requirements",
+    "c7_movement_restriction",
+    "c8_international_travel",
+    "h1_public_information_campaigns",
+    "h2_testing_policy",
+    "h3_contact_tracing",
+    "h6_facial_coverings",
+    "h7_vaccination_policy",
+    "h8_protection_of_elderly_people",
+]
+
 MEASURES_NAMES = {'c1_school_closing': 'School Closing', 'c2_workplace_closing':'Workplace Closing', 'c3_cancel_public_events': 'Public Events Cancelled' }
 SERIES_NAMES = [{'label':'New Cases', 'value':"cases"},]
 TRANSFORMS_NAMES = [{'label':'Seven Day Average', 'value':"Seven Day Average"},]
@@ -204,10 +226,11 @@ app.layout = html.Div(
                                                 {'label': 'School Closing at all Levels', 'value': 'c1_school_closing'},
                                                 {'label': 'Closing of all-but-essential Workplaces', 'value': 'c2_workplace_closing'},
                                                 {'label': 'Public Events Cancelled', 'value': 'c3_cancel_public_events'}
-                                                
+                                            
                                             ],
                                             #value='c1_school_closing',
                                             clearable=True,
+                                            multi=True,
                                             style=DROP_DOWN_STYLE
                                         )
                                     ]
@@ -297,16 +320,17 @@ app.layout = html.Div(
     Input('drop-down-series-2-transform', 'value'),
     Input('drop-down-measure-area', 'value'),
 )
-def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transform_2, measure):
+def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transform_2, measures):
    
     df = daily_data
     measures_dates = get_measure_dates_dict(daily_data)
+
     series = get_data(series_1=series1,
-                               filters_1={"Sex": sex_series1},
-                               transform_1=transform_1,
-                               series_2=series2,
-                               filters_2={"Sex": sex_series2},
-                               transform_2=transform_2)
+                            filters_1={"Sex": sex_series1},
+                            transform_1=transform_1,
+                            series_2=series2,
+                            filters_2={"Sex": sex_series2},
+                            transform_2=transform_2)
     dates = series.index
     trace1 = dict(x=dates, type="scatter",)
     trace2 = dict()
@@ -340,22 +364,42 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
     )
     fig = go.Figure(data=[trace1, trace2], layout=layout)
     
-    if measure:
-        areas_dicts = []
-        for i in range(int(len(measures_dates[measure]) / 2)):
-            this_dates = [str(measures_dates[measure][i + i]), str(measures_dates[measure][i + i + 1])]
-            areas_dicts.append(get_plot_area_dict(this_dates, measure, MEASURES_COLORS[measure]))
+    if measures:
+        y_0_count = 0
+        for measure in measures:
+            print(f"y_0_count: {y_0_count}")
+            y_0 = y_0_count
+            y_1 = y_0_count + 12000 / len(measures)
+            print(f"y_0: {y_0}")
+            print(f"y_1: {y_1}")
+            areas_dicts = {}
+            for level in np.sort(daily_data[measure].unique()):
+                this_areas_dicts = []
+                if level == 0: 
+                    continue
+                else: 
+                    for i in range(int(len(measures_dates[measure][level]) / 2)):
+                        this_dates = [str(measures_dates[measure][level][i + i]), str(measures_dates[measure][level][i + i + 1])]
+                        this_areas_dicts.append(get_plot_area_dict(this_dates, measure, MEASURES_COLORS[measure][level]))
+                    areas_dicts[level] = this_areas_dicts
 
-        for area in areas_dicts:
-            fig.add_vrect(x0=area['x0'],
-                        x1=area['x1'],
-                        annotation_text=area['annotation_text'],
-                        fillcolor=area['fillcolor'],
-                        annotation_position=area['annotation_position'],
-                        annotation=area['annotation'],
-                        opacity=area['opacity'],
-                        line_width=area['line_width'])
-    
+            for level in np.sort(daily_data[measure].unique()):
+
+                if level == 0: 
+                    continue
+                else: 
+                    for area in areas_dicts[level]:
+                        fig.add_shape(type="rect",
+                                x0=area['x0'],
+                                x1=area['x1'],
+                                y0=y_0,
+                                y1=y_1,
+                                fillcolor=area['fillcolor'],
+                                opacity=area['opacity'],
+                                line_width=area['line_width']
+                            )
+
+            y_0_count += 12000 / len(measures)
 
     return fig
 
@@ -407,11 +451,8 @@ def get_plot_area_dict(dates, measure, color):
     return dict(
         x0=dates[0],
         x1=dates[1],
-        annotation_text=MEASURES_NAMES[measure],
         fillcolor=color,
-        annotation_position="top left",
-        annotation=dict(font_size=18,font_family="Helvetica"),
-        opacity=0.25,
+        opacity=0.50,
         line_width=0
     )
 
@@ -427,20 +468,25 @@ def find_start_end_dates(measure,df):
 
 
 def get_measure_dates_dict(df):
+    measure_dates = {}
 
-    measures=['c1_school_closing',
-        'c2_workplace_closing', 'c3_cancel_public_events',
-        'c4_restrictions_on_gatherings', 'c5_close_public_transport',
-        'c6_stay_at_home_requirements', 'c7_movement_restriction',
-        'c8_international_travel', 'h1_public_information_campaigns',
-        'h2_testing_policy', 'h3_contact_tracing', 'h6_facial_coverings',
-        'h7_vaccination_policy', 'h8_protection_of_elderly_people']
-    measure_dates=dict()
-
-    for measure in measures:
-        measure_dates[measure] = find_start_end_dates(measure, df)
-    
+    for measure in MEASURES: 
+        measure_dates[measure] = {}
+        for level in np.sort(daily_data[measure].unique()):
+            if level ==0: 
+                continue
+            else: 
+                measure_level = pd.DataFrame()
+                measure_level[measure]=make_measures_0_1(daily_data[measure], level)
+                measure_level['Date_statistics']=daily_data['Date_statistics']
+                measure_dates[measure][level] = find_start_end_dates(measure, measure_level)
     return measure_dates
+
+
+def make_measures_0_1(column, max_level):
+    column=np.where(column==max_level,column, 0)
+    column=np.where(column==0,column, 1)
+    return column
 
 
 # Run the app
