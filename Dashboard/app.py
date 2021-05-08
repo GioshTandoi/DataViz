@@ -14,13 +14,29 @@ from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 
 
+
+
 # Declare Constants
 MEASURES_COLORS = {
-    "c1_school_closing": {1: "#bbc9e0", 2: "#cad5e7", 3: "#d9e1ee"},
-    "c2_workplace_closing": {1: "#bbc9e0", 2: "#cad5e7", 3: "#d9e1ee"},
-    "c3_cancel_public_events": {1: "#bbc9e0", 2: "#cad5e7"},
-
+    "c1_school_closing":  {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"},
+    "c2_workplace_closing":  {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
+    "c3_cancel_public_events":  {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
 }
+
+
+# Colors with shades
+# Red :     {1: "#ffcccc", 2: "#ff0000", 3: "#800000"},
+
+# Green:    {1: "#99ff99", 2: "#00b300", 3: "#004d00"},
+
+# Blue:       {1: "#99e6ff", 2: "#00bfff", 3: "#006080"},
+
+# Pink:      {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
+
+# Yellow:    {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
+
+# Orange:    {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"}
+
 MEASURES = [
     "c1_school_closing",
     "c2_workplace_closing",
@@ -205,7 +221,7 @@ app.layout = html.Div(
                                                 dcc.Dropdown(
                                                     id='drop-down-series-2-transform',
                                                     options=TRANSFORMS_NAMES,
-                                                    #value="Seven Day Average",
+                                                    value="Seven Day Average",
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
                                                 )
@@ -359,6 +375,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
         paper_bgcolor=app_color["graph_bg"],
         font={"color": "#fff"},
         height=700,
+        # annotation_text='c1_school_closing',
         xaxis =  {'showgrid': False},
         yaxis = {'showgrid': False}
     )
@@ -369,7 +386,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
         for measure in measures:
             print(f"y_0_count: {y_0_count}")
             y_0 = y_0_count
-            y_1 = y_0_count + 12000 / len(measures)
+            y_1 = y_0_count + 12433 / len(measures)
             print(f"y_0: {y_0}")
             print(f"y_1: {y_1}")
             areas_dicts = {}
@@ -399,7 +416,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
                                 line_width=area['line_width']
                             )
 
-            y_0_count += 12000 / len(measures)
+            y_0_count += 12433 / len(measures)
 
     return fig
 
@@ -491,4 +508,5 @@ def make_measures_0_1(column, max_level):
 
 # Run the app
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=True,host = '127.0.0.1')
+    #app.run_server(host='127.0.0.1', port=8050, debug=True)
