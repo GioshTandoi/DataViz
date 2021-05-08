@@ -1,6 +1,7 @@
 from typing import List, Dict
 import pandas as pd
-from utils.raw_data import raw_data
+from pandas.core.series import Series
+from raw_data import raw_data
 
 
 MIN_DATE = '2020-01-01'
@@ -10,27 +11,47 @@ def fill_zero_days(data):
     idx = pd.date_range(MIN_DATE, MAX_DATE)
     return data.reindex(idx, fill_value=0)
 
-def apply_filters(data, filters):
+def apply_filters(series, data, filters):
     if not filters:
         return data
 
-    for column, values in filters.items():
+    for dimension, values in filters.items():
+        column = data_structure[series]["filter"][dimension]["column"]
         data = data[data[column].isin(values)]
 
     return data
 
 def get_daily_cases(data, filters = None, transform=None):
     series = data['cases_national'].copy()
-    series = apply_filters(series, filters)
+    series = apply_filters("cases", series, filters)
     series = series.groupby(by=series['Date_statistics']).count()
     series = series.rename(columns={'Date_file': "series"})
-    series = series["series"]
     series = fill_zero_days(series)
 
-    return series
+    if transform:
+        series = data_structure["cases"]["transformers"][transform](series)
+
+    return series["series"]
+
+def get_daily_tests(data, filters = None, transform=None):
+    series = data['tests'].copy()
+    series = apply_filters("cases", series, filters)
+    series = series.groupby(by=series['Date_statistics']).sum()
+    series = series.rename(columns={'Tested_with_result': "series"})
+    series = fill_zero_days(series)
+
+    if transform:
+        series = data_structure["tests"]["transformers"][transform](series)
+
+    return series["series"]
+
 
 def trans_seven_day_average(series, **kwargs):
-    pass
+    return series.rolling(window=7).mean()
+
+def trans_tests_per_positive(series):
+    series["series"] = series["series"]/series["Tested_positive"]
+    return series
 
 
 data_structure = {
@@ -38,12 +59,37 @@ data_structure = {
         "getter": get_daily_cases,
         "filter": {
             "Sex": {
+                "column": "Sex",
                 "type": "category",
                 "values": ["Male", "Female"],
+            },
+            "Region": {
+                "column": "Province",
+                "type": "category",
+                "values": raw_data['cases_national']["Province"].unique(),
+            },
+            "Age group": {
+                "column": "Agegroup",
+                "type": "category",
+                "values": raw_data['cases_national']["Agegroup"].unique(),
             },
         },
         "transformers": {
             "Seven Day Average": trans_seven_day_average,
+        },
+    },
+    "tests": {
+        "getter": get_daily_tests,
+        "filter": {
+            "Region": {
+                "column": "Security_region_name",
+                "type": "category",
+                "values": raw_data['tests']["Security_region_name"].unique(),
+            },
+        },
+        "transformers": {
+            "Seven Day Average": trans_seven_day_average,
+            "Per Positive result": trans_tests_per_positive,
         },
     },
 }
@@ -68,11 +114,15 @@ def get_data(
 
 
 if __name__ == '__main__':
-    print('daily cases')
-    cases = get_daily_cases(raw_data)
-    print(cases.tail(60))
 
-    cases = get_daily_cases(raw_data, filters={"Sex": ["Male"]})
-    print(cases.tail(60))
+    print(get_data(series_1="cases", filters_1={"Sex": ["Male"]},
+        series_2="cases", transform_2="Seven Day Average").tail(20))
 
-    print(get_data(series_1="cases", filters_1={"Sex": ["Male"]}, series_2="cases"))
+    print(get_data(series_1="cases", filters_1={"Sex": ["Male"], "Region": ["Groningen"]},
+        series_2="cases", transform_2="Seven Day Average").tail(20))
+
+    print(get_data(series_1="tests",
+        series_2="tests", transform_2="Seven Day Average").tail(20))
+
+    print(get_data(series_1="tests",
+        series_2="tests", transform_2="Per Positive result").tail(20))

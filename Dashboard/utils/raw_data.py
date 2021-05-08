@@ -4,7 +4,7 @@ processing steps.
 from pathlib import Path
 import pandas as pd
 
-data_folder = Path("data")
+data_folder = Path(__file__).parent.parent / "data"
 
 files = {
     "aggregated_cases_municipality": "COVID-19_aantallen_gemeente_cumulatief.csv",
@@ -30,4 +30,9 @@ for key, file in files.items():
 raw_data['cases_national']['Date_statistics'] = pd.to_datetime(
     raw_data['cases_national']['Date_statistics'],
     format='%d/%m/%Y', exact = False,
+    )
+
+raw_data['tests']['Date_statistics'] = pd.to_datetime(
+    raw_data['tests']['Date_of_statistics'],
+    format='%Y-%m-%d', exact = False,
     )
