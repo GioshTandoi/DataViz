@@ -94,14 +94,19 @@ app.layout = html.Div(
             [
                 html.Ul(
                     [
-                        html.Li(html.Span( "School Closing",className="school_closing") ),
-                        html.Li(html.Span( "Workplace Closing",className="workplace_closing") ),
-                        html.Li(html.Span( "Public Events",className="public_events") ),
-                        html.Li(html.Span( "Gatherings",className="gatherings") ),
-                        html.Li(html.Span( "Public Transport",className="public_transport") ),
-                        html.Li(html.Span( "Stay At Home",className="stay_at_home") ),
-                        html.Li(html.Span( "Movement Restriction",className="movement_restriction") ),
-                        html.Li(html.Span("International Travel Restrictions", className="international_travel"))
+                        html.Li([html.Span(className="school_closing") ,"School Closing"]),
+                        html.Li([html.Span(className="workplace_closing") ,"Workplace Closing"]),
+                        html.Li([html.Span(className="public_events") ,"Public Events"]),
+                        html.Li([html.Span(className="gatherings") ,"Gatherings"]),
+                        html.Li([html.Span(className="public_transport") ,"Public Transport"]),
+                        html.Li([html.Span(className="stay_at_home") ,"Stay At Home"]),
+                        html.Li([html.Span(className="movement_restriction") ,"Movement Restriction"]),
+                        html.Li([html.Span(className="international_travel") ,"International Travel Restrictions"])
+
+
+
+
+
                     ]
                 ,className="legend"
 

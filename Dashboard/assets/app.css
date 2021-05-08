@@ -36,7 +36,7 @@
 .legend li { float: left; margin-right: 10px; }
 .legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
 /* your colors */
-.legend .school_closing { background-color: #99003d; }
+.legend .school_closing { background-color: #99003d;text-decoration-color:#ccc; }
 .legend .workplace_closing { background-color: #ffff00; }
 .legend .public_events { background-color:#ff9900; }
 .legend .gatherings{ background-color: #ff0000; }
