@@ -33,17 +33,17 @@
 
 /* basic positioning */
 .legend { list-style: none; }
-.legend li { float: left; margin-right: 10px; }
-.legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
+.legend li { float: left; margin-right: 10px; color:white; font-family: "Open Sans";}
+.legend span {float: left; width: 20px; height: 20px; margin: 5px; }
 /* your colors */
-.legend .school_closing { background-color: #99003d;text-decoration-color:#ccc; }
-.legend .workplace_closing { background-color: #ffff00; }
-.legend .public_events { background-color:#ff9900; }
-.legend .gatherings{ background-color: #ff0000; }
-.legend .public_transport { background-color: #00b300; }
-.legend .stay_at_home { background-color: #00bfff; }
-.legend .movement_restriction { background-color:#9900cc; }
-.legend .international_travel { background-color: #c2c2a3; }
+.legend .school_closing { background-color: #ff0066; opacity: 50%; }
+.legend .workplace_closing { background-color: #ffff00; opacity: 50%;}
+.legend .public_events { background-color:#ff9900; opacity: 50%;}
+.legend .gatherings{ background-color: #ff0000; opacity: 50%;}
+.legend .public_transport { background-color: #00b300; opacity: 50%;}
+.legend .stay_at_home { background-color: #00bfff; opacity: 50%; }
+.legend .movement_restriction { background-color:#ecb3ff; opacity: 50%;}
+.legend .international_travel { background-color: #c2c2a3; opacity: 50%; }
 
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
