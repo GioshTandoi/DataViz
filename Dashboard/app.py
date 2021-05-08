@@ -14,28 +14,7 @@ from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 
 
-
-
 # Declare Constants
-MEASURES_COLORS = {
-    "c1_school_closing":  {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"},
-    "c2_workplace_closing":  {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
-    "c3_cancel_public_events":  {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
-}
-
-
-# Colors with shades
-# Red :     {1: "#ffcccc", 2: "#ff0000", 3: "#800000"},
-
-# Green:    {1: "#99ff99", 2: "#00b300", 3: "#004d00"},
-
-# Blue:       {1: "#99e6ff", 2: "#00bfff", 3: "#006080"},
-
-# Pink:      {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
-
-# Yellow:    {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
-
-# Orange:    {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"}
 
 MEASURES = [
     "c1_school_closing",
@@ -46,16 +25,35 @@ MEASURES = [
     "c6_stay_at_home_requirements",
     "c7_movement_restriction",
     "c8_international_travel",
-    "h1_public_information_campaigns",
-    "h2_testing_policy",
-    "h3_contact_tracing",
-    "h6_facial_coverings",
-    "h7_vaccination_policy",
-    "h8_protection_of_elderly_people",
 ]
 
-MEASURES_NAMES = {'c1_school_closing': 'School Closing', 'c2_workplace_closing':'Workplace Closing', 'c3_cancel_public_events': 'Public Events Cancelled' }
-SERIES_NAMES = [{'label':'New Cases', 'value':"cases"},]
+MEASURES_COLORS = {
+    "c1_school_closing": {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
+    "c2_workplace_closing": {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
+    "c3_cancel_public_events": {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"},
+    "c4_restrictions_on_gatherings": {1: "#ffcccc", 2: "#ff0000", 3: "#800000",4:"#330033"},
+    "c5_close_public_transport": {1: "#99ff99", 2: "#00b300", 3: "#004d00"},
+    "c6_stay_at_home_requirements": {1: "#99e6ff", 2: "#00bfff", 3: "#006080"},
+    "c7_movement_restriction": {1: "#ecb3ff", 2: "##9900cc", 3: "#4d0066"},
+    "c8_international_travel":{1: "##ebebe0", 2: "#c2c2a3", 3: "#7a7a52",4:"#2e2e1f"}
+}
+
+MEASURES_NAMES = {
+    "c1_school_closing": "School Closing",
+    "c2_workplace_closing": "Workplace Closing",
+    "c3_cancel_public_events": "Public Events Cancelled",
+    "c4_restrictions_on_gatherings": "Restrictions on Gathering",
+    "c5_close_public_transport": "Closing of public transport",
+    "c6_stay_at_home_requirements": "Stay At Home Restrictions",
+    "c7_movement_restriction": "Movement Restrictions",
+    "c8_international_travel": "Restrictions on International Travel"
+}
+
+SERIES_NAMES = [{'label':'New Cases', 'value':"cases"},
+                {'label': 'Number of Tests', 'value': 'tests'},
+                {'label': 'ICU admissions', 'value': 'ICU admissions'}]
+                
+
 TRANSFORMS_NAMES = [{'label':'Seven Day Average', 'value':"Seven Day Average"},]
 DROP_DOWN_STYLE = {'margin-top': '10px', 'margin-left': '10px', 'margin-right': '40px'}
 
@@ -90,6 +88,26 @@ app.layout = html.Div(
                 ) 
             ],
             className="app__header"
+        ),
+        #Content0
+        html.Div(
+            [
+                html.Ul(
+                    [
+                        html.Li(html.Span( "School Closing",className="school_closing") ),
+                        html.Li(html.Span( "Workplace Closing",className="workplace_closing") ),
+                        html.Li(html.Span( "Public Events",className="public_events") ),
+                        html.Li(html.Span( "Gatherings",className="gatherings") ),
+                        html.Li(html.Span( "Public Transport",className="public_transport") ),
+                        html.Li(html.Span( "Stay At Home",className="stay_at_home") ),
+                        html.Li(html.Span( "Movement Restriction",className="movement_restriction") ),
+                        html.Li(html.Span("International Travel Restrictions", className="international_travel"))
+                    ]
+                ,className="legend"
+
+                )
+            ],
+            className="app__content"
         ),
         # Content 1
         html.Div(
@@ -230,7 +248,7 @@ app.layout = html.Div(
                                     ],
                                 ),
                                 html.Div(
-                                    [
+                                    [   
                                         html.Hr(style={'margin-bottom': '0px', 'margin-top': '15px'}),
                                         html.H6(
                                             "Measure:",
@@ -241,8 +259,12 @@ app.layout = html.Div(
                                             options=[
                                                 {'label': 'School Closing at all Levels', 'value': 'c1_school_closing'},
                                                 {'label': 'Closing of all-but-essential Workplaces', 'value': 'c2_workplace_closing'},
-                                                {'label': 'Public Events Cancelled', 'value': 'c3_cancel_public_events'}
-                                            
+                                                {'label': 'Public Events Cancelled', 'value': 'c3_cancel_public_events'},
+                                                {'label': 'Restrictions on Gathering', 'value': "c4_restrictions_on_gatherings"},
+                                                {'label': 'Public Transport Closing', 'value': "c5_close_public_transport"},
+                                                {'label': 'Stay At Home', 'value': "c6_stay_at_home_requirements"},
+                                                {'label': 'Restrictions on Movement', 'value': "c7_movement_restriction"},
+                                                {'label': 'Restrictions on International Travel', 'value': "c8_international_travel"}
                                             ],
                                             #value='c1_school_closing',
                                             clearable=True,
@@ -306,9 +328,19 @@ app.layout = html.Div(
                                         dcc.Dropdown(
                                             id='drop-down-4',
                                             options=[
-                                                {   'label': 'Stay Home When Sick', 'value': "Bij_klachten_blijf_thuis"},
-                                                    {'label': 'Keep 1.5m Distance', 'value': "Houd_1_5m_afstand"},
-                                            ],
+                                                {'label': 'Stay Home When Sick', 'value': "Bij_klachten_blijf_thuis"},
+                                                {'label': 'Keep 1.5m Distance', 'value': "Houd_1_5m_afstand"},
+                                                {'label': 'Get Tested When Sick', 'value': "Bij_klachten_laat_testen"},
+                                                {'label': 'Restrict the number of visitors at home', 'value': "Ontvang_max_bezoekers_thuis"},
+                                                {'label': 'Avoid Crowded Spaces', 'value': "Vermijd_drukke_plekken"},
+                                                {'label': 'Wash your hands frequently', 'value': "Was_vaak_je_handen"},
+                                                {'label': 'Worry about COVID-19', 'value': "Zorgen_over_Coronavirus"},
+                                                {'label': 'Wear face mask in public indoor spaces', 'value': "Draag_mondkapje_in_publieke_binnenruimtes"},
+                                                {'label': 'Cough in your elbow', 'value': "Hoest_niest_in_elleboog"},
+                                                {'label': 'Work from home as much as possible', 'value': "Werkt_thuis"},
+                                                #{'label': '', 'value': "Draag_mondkapje_in_ov"},
+                                                {'label': 'Curfew', 'value': "Avondklok"}
+                                                ],
                                             value="Bij_klachten_blijf_thuis"
                                         ),
                                     ],
@@ -340,13 +372,17 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
    
     df = daily_data
     measures_dates = get_measure_dates_dict(daily_data)
+    print(series1)
+    print(series2)
+    print([x['label'] if x['value'] == series2 else '' for x in SERIES_NAMES])
 
     series = get_data(series_1=series1,
-                            filters_1={"Sex": sex_series1},
-                            transform_1=transform_1,
+                            #filters_1={"Sex": sex_series1},
+                            #transform_1=transform_1,
                             series_2=series2,
-                            filters_2={"Sex": sex_series2},
-                            transform_2=transform_2)
+                            #filters_2={"Sex": sex_series2},
+                            #transform_2=transform_2
+                        )
     dates = series.index
     trace1 = dict(x=dates, type="scatter",)
     trace2 = dict()
@@ -355,7 +391,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             type="scatter",
             y=series['series_1'],
             x=dates,
-            name= [x['label'] if x['value'] == series1 else '' for x in SERIES_NAMES][0],
+            name= [nn if nn != '' else '' for nn in [x['label'] if x['value'] == series1 else '' for x in SERIES_NAMES]][0],
             line={"color": "#42C4F7"},
             mode="lines",
         )
@@ -365,7 +401,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             type="scatter",
             y=series['series_2'],
             x=dates,
-            name=[x['label'] if x['value'] == series2 else '' for x in SERIES_NAMES][0],
+            name=[nn if nn != '' else '' for nn in [x['label'] if x['value'] == series2 else '' for x in SERIES_NAMES]][0],
             line={"color": "#43F7EC"},
             mode="lines",
         )
@@ -379,6 +415,9 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
         xaxis =  {'showgrid': False},
         yaxis = {'showgrid': False}
     )
+    """fig = make_subplots(specs=[[{"secondary_y":True}]])
+    fig.add_trace(trace1, secondary_y=False)
+    fig.add_trace(trace1, secondary_y=True)"""
     fig = go.Figure(data=[trace1, trace2], layout=layout)
     
     if measures:

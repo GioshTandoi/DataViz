@@ -1,7 +1,7 @@
 from typing import List, Dict
 import pandas as pd
 from pandas.core.series import Series
-from raw_data import raw_data
+from utils.raw_data import raw_data
 
 
 MIN_DATE = '2020-01-01'
@@ -124,8 +124,8 @@ def get_data(
             raw_data, filters=filters_1, transform=transform_1)
         data["series_1"] = s1
 
-    if series_1:
-        s2 = data_structure[series_1]["getter"](
+    if series_2:
+        s2 = data_structure[series_2]["getter"](
             raw_data, filters=filters_2, transform=transform_2)
         data["series_2"] = s2
 

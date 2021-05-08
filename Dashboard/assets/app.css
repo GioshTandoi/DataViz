@@ -31,6 +31,20 @@
     z-index: 1002;
 }*/
 
+/* basic positioning */
+.legend { list-style: none; }
+.legend li { float: left; margin-right: 10px; }
+.legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
+/* your colors */
+.legend .school_closing { background-color: #99003d; }
+.legend .workplace_closing { background-color: #ffff00; }
+.legend .public_events { background-color:#ff9900; }
+.legend .gatherings{ background-color: #ff0000; }
+.legend .public_transport { background-color: #00b300; }
+.legend .stay_at_home { background-color: #00bfff; }
+.legend .movement_restriction { background-color:#9900cc; }
+.legend .international_travel { background-color: #c2c2a3; }
+
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {
