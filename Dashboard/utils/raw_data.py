@@ -36,3 +36,8 @@ raw_data['tests']['Date_statistics'] = pd.to_datetime(
     raw_data['tests']['Date_of_statistics'],
     format='%Y-%m-%d', exact = False,
     )
+
+raw_data['icu']['Date_statistics'] = pd.to_datetime(
+    raw_data['icu']['Date_of_statistics'],
+    format='%Y-%m-%d', exact = False,
+    )

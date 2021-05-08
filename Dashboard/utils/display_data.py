@@ -35,7 +35,7 @@ def get_daily_cases(data, filters = None, transform=None):
 
 def get_daily_tests(data, filters = None, transform=None):
     series = data['tests'].copy()
-    series = apply_filters("cases", series, filters)
+    series = apply_filters("tests", series, filters)
     series = series.groupby(by=series['Date_statistics']).sum()
     series = series.rename(columns={'Tested_with_result': "series"})
     series = fill_zero_days(series)
@@ -45,11 +45,22 @@ def get_daily_tests(data, filters = None, transform=None):
 
     return series["series"]
 
+def get_daily_icu_admissions(data, filters = None, transform=None):
+    series = data['icu'].copy()
+    series = series.groupby(by=series['Date_statistics']).sum()
+    series = series.rename(columns={'IC_admission': "series"})
+    series = fill_zero_days(series)
+
+    if transform:
+        series = data_structure["ICU admissions"]["transformers"][transform](series)
+
+    return series["series"]
+
 
 def trans_seven_day_average(series, **kwargs):
     return series.rolling(window=7).mean()
 
-def trans_tests_per_positive(series):
+def trans_tests_per_positive(series, **kwargs):
     series["series"] = series["series"]/series["Tested_positive"]
     return series
 
@@ -92,6 +103,14 @@ data_structure = {
             "Per Positive result": trans_tests_per_positive,
         },
     },
+    "ICU admissions": {
+        "getter": get_daily_icu_admissions,
+        "filter": {
+        },
+        "transformers": {
+            "Seven Day Average": trans_seven_day_average,
+        },
+    },
 }
 
 def get_data(
@@ -126,3 +145,6 @@ if __name__ == '__main__':
 
     print(get_data(series_1="tests",
         series_2="tests", transform_2="Per Positive result").tail(20))
+
+    print(get_data(series_1="ICU admissions",
+        series_2="ICU admissions", transform_2="Seven Day Average").tail(20))
