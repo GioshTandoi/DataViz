@@ -13,7 +13,6 @@ from utils.display_data import get_data
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 
-
 # Declare Constants
 
 MEASURES = [
@@ -80,7 +79,7 @@ app.layout = html.Div(
                     [
                         html.H4("CORONA DASHBOARD", className="app__header__title"),
                         html.P(
-                            "This is a dashboard about corona, ejoy. ",
+                            "",
                             className="app__header__title--grey",
                         )
                     ],
@@ -89,9 +88,13 @@ app.layout = html.Div(
             ],
             className="app__header"
         ),
+        html.Div([html.H6("MEASURES LEGEND",className="legend-title"),
+                          html.A(html.Button('More Info', id='btn-nclicks-1', n_clicks=0, className="button_more"),href='https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/codebook.md'),
+   
+                                                          ]),
         #Content0
         html.Div(
-            [
+             [    
                 html.Ul(
                     [
                         html.Li([html.Span(className="school_closing") ,"School Closing"]),
@@ -108,9 +111,12 @@ app.layout = html.Div(
 
 
                     ]
-                ,className="legend"
+                ,className="legend")
 
-                )
+            
+
+
+
             ],
             className="app__content"
         ),

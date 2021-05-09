@@ -33,7 +33,7 @@
 
 /* basic positioning */
 .legend { list-style: none; }
-.legend li { float: left; margin-right: 10px; color:white; font-family: "Open Sans";}
+.legend li { float: left; margin-right: 10px; color:white; font-family: "Helvetica Neue";}
 .legend span {float: left; width: 20px; height: 20px; margin: 5px; }
 /* your colors */
 .legend .school_closing { background-color: #ff0066; opacity: 50%; }
@@ -44,6 +44,11 @@
 .legend .stay_at_home { background-color: #00bfff; opacity: 50%; }
 .legend .movement_restriction { background-color:#ecb3ff; opacity: 50%;}
 .legend .international_travel { background-color: #c2c2a3; opacity: 50%; }
+
+.button_more {display:inline-block;background-color: #082255; color: white; font-family: "Helvetica Neue"; }
+.legend-title {display:inline-block;background-color: #082255; color: white; font-family: "Helvetica Neue";margin-right: 20px;}
+
+ /*"HelveticaNeue", "Helvetica Neue", Helvetica, Arial,
 
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
