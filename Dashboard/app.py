@@ -8,6 +8,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from utils.display_data import get_data
 
 from dash.exceptions import PreventUpdate
@@ -51,10 +52,27 @@ MEASURES_NAMES = {
 SERIES_NAMES = [{'label':'New Cases', 'value':"cases"},
                 {'label': 'Number of Tests', 'value': 'tests'},
                 {'label': 'ICU admissions', 'value': 'ICU admissions'}]
+
+SERIES_NAMES2 = {'cases': 'New Cases', 'tests':'Number of Tests', 'ICU admissions':'ICU admissions'}
                 
 
 TRANSFORMS_NAMES = [{'label':'Seven Day Average', 'value':"Seven Day Average"},]
 DROP_DOWN_STYLE = {'margin-top': '10px', 'margin-left': '10px', 'margin-right': '40px'}
+
+SERIES_PROPERTIES = {
+    "cases": {
+        "filters": ["Sex","Region","Age group"],
+        "transformers": ["Seven Day Average"]
+    },
+    "tests": {
+        "filters":["Region"],
+        "transformers": ["Seven Day Average", "Per Positive result"],
+    },
+    "ICU admissions": {
+        "filters": [],
+        "transformers": ["Seven Day Average"],
+    },
+}
 
 # Load Data
 daily_data = pd.read_csv('data/daily_data.csv', sep=',')
@@ -250,7 +268,6 @@ app.layout = html.Div(
                                                 dcc.Dropdown(
                                                     id='drop-down-series-2-transform',
                                                     options=TRANSFORMS_NAMES,
-                                                    value="Seven Day Average",
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
                                                 )
@@ -373,26 +390,30 @@ app.layout = html.Div(
     Output("g1", "figure"),
     Input('drop-down-series-1', 'value'),
     Input('drop-down-series-1-sex', 'value'),
-    Input('drop-down-series-2-transform', 'value'),
+    Input('drop-down-series-1-transform', 'value'),
     Input('drop-down-series-2', 'value'),
     Input('drop-down-series-2-sex', 'value'),
     Input('drop-down-series-2-transform', 'value'),
     Input('drop-down-measure-area', 'value'),
 )
 def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transform_2, measures):
-   
+    filters_1 = {}
+    filters_2 = {}
+
+    if series1 and'Sex' in SERIES_PROPERTIES[series1]['filters']:
+        filters_1 = {"Sex": sex_series1}
+    if series2 and 'Sex' in SERIES_PROPERTIES[series2]['filters']:
+        filters_2 = {"Sex": sex_series2}
+        
     df = daily_data
     measures_dates = get_measure_dates_dict(daily_data)
-    print(series1)
-    print(series2)
-    print([x['label'] if x['value'] == series2 else '' for x in SERIES_NAMES])
 
     series = get_data(series_1=series1,
-                            #filters_1={"Sex": sex_series1},
-                            #transform_1=transform_1,
+                            filters_1=filters_1,
+                            transform_1=transform_1,
                             series_2=series2,
-                            #filters_2={"Sex": sex_series2},
-                            #transform_2=transform_2
+                            filters_2=filters_2,
+                            transform_2=transform_2
                         )
     dates = series.index
     trace1 = dict(x=dates, type="scatter",)
@@ -402,7 +423,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             type="scatter",
             y=series['series_1'],
             x=dates,
-            name= [nn if nn != '' else '' for nn in [x['label'] if x['value'] == series1 else '' for x in SERIES_NAMES]][0],
+            name= SERIES_NAMES2[series1],
             line={"color": "#42C4F7"},
             mode="lines",
         )
@@ -412,33 +433,31 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             type="scatter",
             y=series['series_2'],
             x=dates,
-            name=[nn if nn != '' else '' for nn in [x['label'] if x['value'] == series2 else '' for x in SERIES_NAMES]][0],
+            name=SERIES_NAMES2[series2],
             line={"color": "#43F7EC"},
             mode="lines",
         )
-
-    layout = dict(
-        plot_bgcolor=app_color["graph_bg"],
-        paper_bgcolor=app_color["graph_bg"],
-        font={"color": "#fff"},
-        height=700,
-        # annotation_text='c1_school_closing',
-        xaxis =  {'showgrid': False},
-        yaxis = {'showgrid': False}
-    )
-    """fig = make_subplots(specs=[[{"secondary_y":True}]])
+    fig = make_subplots(specs=[[{"secondary_y":True}]])
     fig.add_trace(trace1, secondary_y=False)
-    fig.add_trace(trace1, secondary_y=True)"""
-    fig = go.Figure(data=[trace1, trace2], layout=layout)
+    fig.add_trace(trace2, secondary_y=True)
+    fig.update_layout(plot_bgcolor=app_color["graph_bg"],
+                      paper_bgcolor=app_color["graph_bg"],
+                      font={"color": "#fff"},
+                      height=700,
+                      xaxis={'showgrid': False},
+                      xaxis2={'showgrid': False},
+                      yaxis2 = {'showgrid': False},
+                      yaxis={'showgrid': False})
+    if series1: 
+        fig.update_yaxes(title_text=SERIES_NAMES2[series1], secondary_y=False)
+    if series2: 
+        fig.update_yaxes(title_text=SERIES_NAMES2[series2], secondary_y=True)
     
     if measures:
         y_0_count = 0
         for measure in measures:
-            print(f"y_0_count: {y_0_count}")
             y_0 = y_0_count
             y_1 = y_0_count + 12433 / len(measures)
-            print(f"y_0: {y_0}")
-            print(f"y_1: {y_1}")
             areas_dicts = {}
             for level in np.sort(daily_data[measure].unique()):
                 this_areas_dicts = []
