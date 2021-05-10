@@ -473,6 +473,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
                       xaxis2={'showgrid': False},
                       yaxis2 = {'showgrid': False},
                       yaxis={'showgrid': False})
+                      # legend_x=0.9)
     if series1: 
         fig.update_yaxes(title_text=SERIES_NAMES2[series1], secondary_y=False)
     if series2: 
@@ -548,7 +549,7 @@ def behaviour_plot(behaviour):
         paper_bgcolor=app_color["graph_bg"],
         font={"color": "#fff"},
         height=500,
-        width=1850,
+        # width=1850,
         xaxis =  {'showgrid': False},
         yaxis={'showgrid': False},
         showlegend=True,
