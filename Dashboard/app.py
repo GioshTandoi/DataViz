@@ -251,17 +251,19 @@ app.layout = html.Div(
                                                     "Filters:",
                                                     className="graph__sub__title",
                                                 ),
-                                                dcc.Checklist(
-                                                    id='drop-down-series-1-sex',
-                                                    options=[
-                                                        {'label': 'Males', 'value': 'Male'},
-                                                        {'label': 'Females', 'value': 'Female'},
-                                                    ],
+                                                dcc.RadioItems(
+                                                    id='radio-series-1-filter-type',
                                                     inputClassName="auto__checkbox",
                                                     labelClassName="auto__label",
                                                     style={'margin-left': '25px', 'margin-right': '25px'},
                                                     labelStyle={'display': 'inline-block'},
-                                                    value=['Male', 'Female']
+                                                ),
+                                                dcc.Dropdown(
+                                                    id='drop-down-series-1-filter-value',
+                                                    style=DROP_DOWN_STYLE,
+                                                    clearable=True,
+                                                    className="our_drop",
+                                                    multi=True,
                                                 ),
                                                 html.P(
                                                     "Transforms:",
@@ -272,7 +274,6 @@ app.layout = html.Div(
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
                                                     className="our_drop"
-
                                                 )
                                             ]
                                         )
@@ -302,17 +303,19 @@ app.layout = html.Div(
                                                     "Filters:",
                                                     className="graph__sub__title",
                                                 ),
-                                                dcc.Checklist(
-                                                    id='drop-down-series-2-sex',
-                                                    options=[
-                                                        {'label': 'Males', 'value': 'Male'},
-                                                        {'label': 'Females', 'value': 'Female'},
-                                                    ],
+                                                dcc.RadioItems(
+                                                    id='radio-series-2-filter-type',
                                                     inputClassName="auto__checkbox",
                                                     labelClassName="auto__label",
                                                     style={'margin-left': '25px', 'margin-right': '25px'},
                                                     labelStyle={'display': 'inline-block'},
-                                                    value=['Male', 'Female']
+                                                ),
+                                                dcc.Dropdown(
+                                                    id='drop-down-series-2-filter-value',
+                                                    style=DROP_DOWN_STYLE,
+                                                    clearable=True,
+                                                    className="our_drop",
+                                                    multi=True,
                                                 ),
                                                 html.P(
                                                     "Transforms:",
@@ -442,21 +445,24 @@ app.layout = html.Div(
 @app.callback(
     Output("g1", "figure"),
     Input('drop-down-series-1', 'value'),
-    Input('drop-down-series-1-sex', 'value'),
+    Input('radio-series-1-filter-type', 'value'),
+    Input('drop-down-series-1-filter-value', 'value'),
     Input('drop-down-series-1-transform', 'value'),
     Input('drop-down-series-2', 'value'),
-    Input('drop-down-series-2-sex', 'value'),
+     Input('radio-series-2-filter-type', 'value'),
+    Input('drop-down-series-2-filter-value', 'value'),
     Input('drop-down-series-2-transform', 'value'),
     Input('drop-down-measure-area', 'value'),
 )
-def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transform_2, measures):
+def main_graph(series1, filter_series1, filter_value_series1, transform_1, series2, filter_series2, filter_value_series2, transform_2, measures):
     filters_1 = {}
     filters_2 = {}
 
-    if series1 and 'Sex' in SERIES_PROPERTIES[series1]['filters']:
-        filters_1 = {"Sex": sex_series1}
-    if series2 and 'Sex' in SERIES_PROPERTIES[series2]['filters']:
-        filters_2 = {"Sex": sex_series2}
+    if filter_value_series1:
+        filters_1[filter_series1] = filter_value_series1
+
+    if filter_value_series2:
+        filters_2[filter_series2] = filter_value_series2
         
     df = daily_data
     measures_dates = get_measure_dates_dict(daily_data)
@@ -568,6 +574,38 @@ def set_series_1_transformers(s1):
     Input('drop-down-series-2', 'value'))
 def set_series_1_transformers(s2):
     return [{'label': i, 'value': i} for i in data_structure[s2]["transformers"].keys()]
+
+@app.callback(
+    Output('radio-series-1-filter-type', 'options'),
+    Input('drop-down-series-1', 'value'))
+def set_series_1_filter_types(series):
+    return [{'label': i, 'value': i} for i in data_structure[series]["filter"].keys()]
+
+@app.callback(
+    Output('radio-series-2-filter-type', 'options'),
+    Input('drop-down-series-2', 'value'))
+def set_series_2_filter_types(series):
+    return [{'label': i, 'value': i} for i in data_structure[series]["filter"].keys()]
+
+@app.callback(
+    Output('drop-down-series-1-filter-value', 'options'),
+    Input('drop-down-series-1', 'value'),
+    Input('radio-series-1-filter-type', 'value'))
+def set_series_1_filter_values(series, filter):
+    try:
+        return [{'label': i, 'value': i} for i in data_structure[series]["filter"][filter]['values']]
+    except:
+        return []
+
+@app.callback(
+    Output('drop-down-series-2-filter-value', 'options'),
+    Input('drop-down-series-2', 'value'),
+    Input('radio-series-2-filter-type', 'value'))
+def set_series_2_filter_values(series, filter):
+    try:
+        return [{'label': i, 'value': i} for i in data_structure[series]["filter"][filter]['values']]
+    except:
+        return []
 
 @app.callback(
     Output("g2", "figure"), Input('drop-down-4', 'value')
