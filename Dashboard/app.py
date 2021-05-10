@@ -330,34 +330,6 @@ app.layout = html.Div(
                                         )
                                     ],
                                 ),
-                                html.Div(
-                                    [   
-                                        html.Hr(style={'margin-bottom': '0px', 'margin-top': '15px'}),
-                                        html.H6(
-                                            "Measure:",
-                                            className="graph__title",
-                                        ),
-                                        dcc.Dropdown(
-                                            id='drop-down-measure-area',
-                                            options=[
-                                                {'label': 'School Closing at all Levels', 'value': 'c1_school_closing'},
-                                                {'label': 'Closing of all-but-essential Workplaces', 'value': 'c2_workplace_closing'},
-                                                {'label': 'Public Events Cancelled', 'value': 'c3_cancel_public_events'},
-                                                {'label': 'Restrictions on Gathering', 'value': "c4_restrictions_on_gatherings"},
-                                                {'label': 'Public Transport Closing', 'value': "c5_close_public_transport"},
-                                                {'label': 'Stay At Home', 'value': "c6_stay_at_home_requirements"},
-                                                {'label': 'Restrictions on Movement', 'value': "c7_movement_restriction"},
-                                                {'label': 'Restrictions on International Travel', 'value': "c8_international_travel"}
-                                            ],
-                                            #value='c1_school_closing',
-                                            clearable=True,
-                                            multi=True,
-                                            style=DROP_DOWN_STYLE
-                                        )
-                                    ]
-                                )
-
-                             
                             ],
                             className="graph__container first",
                         ),
@@ -397,15 +369,41 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.H5(
-                                            "SELECT BEHAVIOUR",
+                                            "SELECT BEHAVIOUR AND MEASURES",
                                             className="graph__title",
+                                        )
+                                    ]
+                                ),
+                                html.Div(
+                                    [   
+                                        html.Hr(style={'margin-bottom': '0px', 'margin-top': '15px'}),
+                                        html.H6(
+                                            "Measure:",
+                                            className="graph__title",
+                                        ),
+                                        dcc.Dropdown(
+                                            id='drop-down-measure-area',
+                                            options=[
+                                                {'label': 'School Closing at all Levels', 'value': 'c1_school_closing'},
+                                                {'label': 'Closing of all-but-essential Workplaces', 'value': 'c2_workplace_closing'},
+                                                {'label': 'Public Events Cancelled', 'value': 'c3_cancel_public_events'},
+                                                {'label': 'Restrictions on Gathering', 'value': "c4_restrictions_on_gatherings"},
+                                                {'label': 'Public Transport Closing', 'value': "c5_close_public_transport"},
+                                                {'label': 'Stay At Home', 'value': "c6_stay_at_home_requirements"},
+                                                {'label': 'Restrictions on Movement', 'value': "c7_movement_restriction"},
+                                                {'label': 'Restrictions on International Travel', 'value': "c8_international_travel"}
+                                            ],
+                                            #value='c1_school_closing',
+                                            clearable=True,
+                                            multi=True,
+                                            style=DROP_DOWN_STYLE
                                         )
                                     ]
                                 ),
                                 html.Div(
                                     [
                                         html.H6(
-                                            "Measure:",
+                                            "Behaviour:",
                                             className="graph__title",
                                         ),
                                         dcc.Dropdown(
@@ -567,25 +565,37 @@ def main_graph(series1, filter_series1, filter_value_series1, transform_1, serie
     Output('drop-down-series-1-transform', 'options'),
     Input('drop-down-series-1', 'value'))
 def set_series_1_transformers(s1):
-    return [{'label': i, 'value': i} for i in data_structure[s1]["transformers"].keys()]
+    try:
+        return [{'label': i, 'value': i} for i in data_structure[s1]["transformers"].keys()]
+    except:
+        return []
 
 @app.callback(
     Output('drop-down-series-2-transform', 'options'),
     Input('drop-down-series-2', 'value'))
 def set_series_1_transformers(s2):
-    return [{'label': i, 'value': i} for i in data_structure[s2]["transformers"].keys()]
+    try:
+        return [{'label': i, 'value': i} for i in data_structure[s2]["transformers"].keys()]
+    except:
+        return []
 
 @app.callback(
     Output('radio-series-1-filter-type', 'options'),
     Input('drop-down-series-1', 'value'))
 def set_series_1_filter_types(series):
-    return [{'label': i, 'value': i} for i in data_structure[series]["filter"].keys()]
+    try:
+        return [{'label': i, 'value': i} for i in data_structure[series]["filter"].keys()]
+    except:
+        return []
 
 @app.callback(
     Output('radio-series-2-filter-type', 'options'),
     Input('drop-down-series-2', 'value'))
 def set_series_2_filter_types(series):
-    return [{'label': i, 'value': i} for i in data_structure[series]["filter"].keys()]
+    try:
+        return [{'label': i, 'value': i} for i in data_structure[series]["filter"].keys()]
+    except:
+        return []
 
 @app.callback(
     Output('drop-down-series-1-filter-value', 'options'),
