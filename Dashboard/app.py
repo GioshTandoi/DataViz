@@ -9,7 +9,7 @@ import dash_html_components as html
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from utils.display_data import get_data
+from utils.display_data import get_data, data_structure
 
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -242,7 +242,7 @@ app.layout = html.Div(
                                                 ),
                                                 dcc.Dropdown(
                                                     id='drop-down-series-1',
-                                                    options=SERIES_NAMES,
+                                                    options=[{'label': s, 'value': s} for s in data_structure.keys()],
                                                     value="cases",
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
@@ -269,8 +269,6 @@ app.layout = html.Div(
                                                 ),
                                                 dcc.Dropdown(
                                                     id='drop-down-series-1-transform',
-                                                    options=TRANSFORMS_NAMES,
-                                                    #value="Seven Day Average",
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
                                                     className="our_drop"
@@ -295,7 +293,7 @@ app.layout = html.Div(
                                                 ),
                                                 dcc.Dropdown(
                                                     id='drop-down-series-2',
-                                                    options=SERIES_NAMES,
+                                                    options=[{'label': s, 'value': s} for s in data_structure.keys()],
                                                     #value="cases",
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
@@ -322,7 +320,6 @@ app.layout = html.Div(
                                                 ),
                                                 dcc.Dropdown(
                                                     id='drop-down-series-2-transform',
-                                                    options=TRANSFORMS_NAMES,
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
                                                 )
@@ -456,7 +453,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
     filters_1 = {}
     filters_2 = {}
 
-    if series1 and'Sex' in SERIES_PROPERTIES[series1]['filters']:
+    if series1 and 'Sex' in SERIES_PROPERTIES[series1]['filters']:
         filters_1 = {"Sex": sex_series1}
     if series2 and 'Sex' in SERIES_PROPERTIES[series2]['filters']:
         filters_2 = {"Sex": sex_series2}
@@ -560,6 +557,17 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
 
     return fig
 
+@app.callback(
+    Output('drop-down-series-1-transform', 'options'),
+    Input('drop-down-series-1', 'value'))
+def set_series_1_transformers(s1):
+    return [{'label': i, 'value': i} for i in data_structure[s1]["transformers"].keys()]
+
+@app.callback(
+    Output('drop-down-series-2-transform', 'options'),
+    Input('drop-down-series-2', 'value'))
+def set_series_1_transformers(s2):
+    return [{'label': i, 'value': i} for i in data_structure[s2]["transformers"].keys()]
 
 @app.callback(
     Output("g2", "figure"), Input('drop-down-4', 'value')
