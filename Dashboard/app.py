@@ -97,8 +97,9 @@ MARGIN_SPAN = '15px'
 MARGIN_SPAN1 = '10px'
 
 # Load Data
-daily_data = pd.read_csv('data/daily_data.csv', sep=',')
-behaviour_data = pd.read_csv('data/behaviour_data.csv', sep=',')
+data_folder = pathlib.Path(__file__).parent / "data"
+daily_data = pd.read_csv(data_folder / 'daily_data.csv', sep=',')
+behaviour_data = pd.read_csv(data_folder / 'behaviour_data.csv', sep=',')
 
 # Initialize App
 app = dash.Dash(
