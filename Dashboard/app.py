@@ -76,7 +76,7 @@ SERIES_NAMES2 = {'cases': 'New Cases', 'tests':'Number of Tests', 'ICU admission
                 
 
 TRANSFORMS_NAMES = [{'label':'Seven Day Average', 'value':"Seven Day Average"},]
-DROP_DOWN_STYLE = {'margin-top': '10px', 'margin-left': '10px', 'margin-right': '40px'}
+DROP_DOWN_STYLE = {'margin-top': '10px', 'margin-left': '10px', 'margin-right': '40px','color': 'black'}
 
 SERIES_PROPERTIES = {
     "cases": {
@@ -238,6 +238,8 @@ app.layout = html.Div(
                                                     #value="Seven Day Average",
                                                     style=DROP_DOWN_STYLE,
                                                     clearable=True,
+                                                    className="our_drop"
+
                                                 )
                                             ]
                                         )
