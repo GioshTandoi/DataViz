@@ -42,11 +42,11 @@ MEASURES_NAMES = {
     "c1_school_closing": "School Closing",
     "c2_workplace_closing": "Workplace Closing",
     "c3_cancel_public_events": "Public Events Cancelled",
-    "c4_restrictions_on_gatherings": "Restrictions on Gathering",
+    "c4_restrictions_on_gatherings": "Restrictions on Gatherings",
     "c5_close_public_transport": "Closing of public transport",
-    "c6_stay_at_home_requirements": "Stay At Home Restrictions",
+    "c6_stay_at_home_requirements": "Stay At Home",
     "c7_movement_restriction": "Movement Restrictions",
-    "c8_international_travel": "Restrictions on International Travel"
+    "c8_international_travel": "International Travel Restrictions"
 }
 
 BEHAVIOUR_NAMES={
@@ -93,6 +93,9 @@ SERIES_PROPERTIES = {
     },
 }
 
+MARGIN_SPAN = '15px'
+MARGIN_SPAN1 = '10px'
+
 # Load Data
 daily_data = pd.read_csv('data/daily_data.csv', sep=',')
 behaviour_data = pd.read_csv('data/behaviour_data.csv', sep=',')
@@ -125,34 +128,65 @@ app.layout = html.Div(
             ],
             className="app__header"
         ),
-        html.Div([html.H6("MEASURES LEGEND",className="legend-title"),
-                          html.A(html.Button('More Info', id='btn-nclicks-1', n_clicks=0, className="button_more"),href='https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/codebook.md'),
-   
-                                                          ]),
+        html.Div(
+            [
+                html.H6("MEASURES LEGEND",className="legend-title"),
+                html.A(html.Button('More Info', id='btn-nclicks-1', n_clicks=0, className="button_more"), href='https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/codebook.md')
+            ]
+        ),
         #Content0
         html.Div(
-             [    
-                html.Ul(
-                    [   html.Li([html.Span(className="movement_restriction") ,"Movement Restriction"]),
-                        html.Li([html.Span(className="school_closing") ,"School Closing"]),
-                        html.Li([html.Span(className="gatherings") ,"Gatherings"]),
-                        html.Li([html.Span(className="public_events") ,"Public Events"]),
-                        html.Li([html.Span(className="workplace_closing") ,"Workplace Closing"]),
-                        html.Li([html.Span(className="public_transport") ,"Public Transport"]),
-                        html.Li([html.Span(className="stay_at_home") ,"Stay At Home"]),
-                        html.Li([html.Span(className="international_travel") ,"International Travel Restrictions"])
+            [
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.Ul(
+                                    [
+                                        html.Span('Movements', style={'margin-left': MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':'#ecb3ff'})]),
+                                        html.Li([html.Span(style={'background':'#9900cc'})]),
+                                        html.Li([html.Span(style={'background':'#4d0066'})]),
+                                        html.Span('Schools', style={'margin-left':MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':'#ffb3d1'})]),
+                                        html.Li([html.Span(style={'background':'#ff0066'})]),
+                                        html.Li([html.Span(style={'background':'#99003d'})]),
+                                        html.Span('Gatherings', style={'margin-left':MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':'#ffcccc'})]),
+                                        html.Li([html.Span(style={'background':'#ff0000'})]),
+                                        html.Li([html.Span(style={'background':'#800000'})]),
+                                        html.Li([html.Span(style={'background':'#4d0000'})]),
+                                        html.Span('Public Events', style={'margin-left': MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':'#ffe0b3'})]),
+                                        html.Li([html.Span(style={'background':"#ff9900"})]),
+                                        html.Li([html.Span(style={'background':"#995c00"})]),
+                                        html.Span('Workplace', style={'margin-left': MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':'#ffffb3'})]),
+                                        html.Li([html.Span(style={'background':"#ffff00"})]),
+                                        html.Li([html.Span(style={'background':"#cccc00"})]),
+                                        html.Span('Public Transport', style={'margin-left': MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':'#99ff99'})]),
+                                        html.Li([html.Span(style={'background':"#00b300"})]),
+                                        html.Li([html.Span(style={'background':"#004d00"})]),
+                                        html.Span('Stay At Home', style={'margin-left': MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':"#99e6ff"})]),
+                                        html.Li([html.Span(style={'background':"#00bfff"})]),
+                                        html.Li([html.Span(style={'background':"#006080"})]),
+                                        html.Span('International Travel', style={'margin-left': MARGIN_SPAN, 'margin-right': MARGIN_SPAN1}),
+                                        html.Li([html.Span(style={'background':"#ebebe0"})]),
+                                        html.Li([html.Span(style={'background':"#c2c2a3"})]),
+                                        html.Li([html.Span(style={'background':"#7a7a52"})]),
+                                        html.Li([html.Span(style={'background':"#2e2e1f"})]),       
+                                    ]
+                                    ,className='legend-labels')
 
-
-
-
+                            ],
+                            className='legend-scale'
+                        )
 
                     ]
-                ,className="legend")
-
-            
-
-
-
+                    ,className="my-legend"
+                    )   
             ],
             className="app__content"
         ),
@@ -446,7 +480,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             x=dates,
             name= SERIES_NAMES2[series1],
             line={"color": "#f2f2f2"}, 
-            line_width=4,
+            line_width=3,
             mode="lines",
             showlegend=True
         )
@@ -458,7 +492,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             x=dates,
             name=SERIES_NAMES2[series2],
             line={"color": "#42C4F7"},
-            line_width=4,
+            line_width=3,
             mode="lines",
             showlegend=True
 
@@ -482,10 +516,17 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
         fig.update_yaxes(title_text=SERIES_NAMES2[series2], secondary_y=True)
     
     if measures:
+        if series1: 
+            max_y_axes = series['series_1'].max()
+        elif series2: 
+            max_y_axes = series['series_2'].max()
+        else:
+            max_y_axes=1200
+
         y_0_count = 0
         for measure in measures:
             y_0 = y_0_count
-            y_1 = y_0_count + 12433 / len(measures)
+            y_1 = y_0_count + max_y_axes / len(measures)
             areas_dicts = {}
             for level in np.sort(daily_data[measure].unique()):
                 this_areas_dicts = []
@@ -514,7 +555,7 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
                                 layer="below"
                             )
 
-            y_0_count += 12433 / len(measures)
+            y_0_count += max_y_axes / len(measures)
 
     return fig
 
@@ -531,7 +572,7 @@ def behaviour_plot(behaviour):
         type="scatter",
         y=df['Value'],
         x=df['Date_of_measurement'],
-        #line={"color": "#42C4F7"},
+        line={"color": "white"},
         mode="markers",
         showlegend=False
     )
@@ -540,8 +581,7 @@ def behaviour_plot(behaviour):
         type="scatter",
         y=df['Value'],
         x=df['Date_of_measurement'],
-        #line={"color": "#42C4F7"},
-        line = dict(width=2, dash='dot'),
+        line = dict(width=3, dash='dot', color='white'),
         name=BEHAVIOUR_NAMES[behaviour]
 
     )
