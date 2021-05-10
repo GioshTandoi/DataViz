@@ -31,7 +31,7 @@ MEASURES_COLORS = {
     "c1_school_closing": {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
     "c2_workplace_closing": {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
     "c3_cancel_public_events": {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"},
-    "c4_restrictions_on_gatherings": {1: "#ffcccc", 2: "#ff0000", 3: "#800000",4:"#330033"},
+    "c4_restrictions_on_gatherings": {1: "#ffcccc", 2: "#ff0000", 3: "#800000",4: "#4d0000"}, #red
     "c5_close_public_transport": {1: "#99ff99", 2: "#00b300", 3: "#004d00"},
     "c6_stay_at_home_requirements": {1: "#99e6ff", 2: "#00bfff", 3: "#006080"},
     "c7_movement_restriction": {1: "#ecb3ff", 2: "##9900cc", 3: "#4d0066"},
@@ -48,6 +48,25 @@ MEASURES_NAMES = {
     "c7_movement_restriction": "Movement Restrictions",
     "c8_international_travel": "Restrictions on International Travel"
 }
+
+BEHAVIOUR_NAMES={
+    "Bij_klachten_blijf_thuis": "Stay Home When Sick",
+    "Houd_1_5m_afstand":'Keep 1.5m Distance',
+    "Bij_klachten_laat_testen": "Get Tested When Sick",
+    "Ontvang_max_bezoekers_thuis":  'Restrict the number of visitors at home',
+    "Vermijd_drukke_plekken": "Avoid Crowded Spaces",
+    "Was_vaak_je_handen": 'Wash your hands frequently',
+    "Zorgen_over_Coronavirus":'Worry about COVID-19',
+    "Draag_mondkapje_in_publieke_binnenruimtes":'Wear face mask in public indoor spaces',
+    "Hoest_niest_in_elleboog":'Cough in your elbow',
+    "Werkt_thuis":'Work from home as much as possible',
+    "Avondklok":'Curfew'
+
+
+
+}
+                                        
+                                                
 
 SERIES_NAMES = [{'label':'New Cases', 'value':"cases"},
                 {'label': 'Number of Tests', 'value': 'tests'},
@@ -114,14 +133,13 @@ app.layout = html.Div(
         html.Div(
              [    
                 html.Ul(
-                    [
+                    [   html.Li([html.Span(className="movement_restriction") ,"Movement Restriction"]),
                         html.Li([html.Span(className="school_closing") ,"School Closing"]),
-                        html.Li([html.Span(className="workplace_closing") ,"Workplace Closing"]),
-                        html.Li([html.Span(className="public_events") ,"Public Events"]),
                         html.Li([html.Span(className="gatherings") ,"Gatherings"]),
+                        html.Li([html.Span(className="public_events") ,"Public Events"]),
+                        html.Li([html.Span(className="workplace_closing") ,"Workplace Closing"]),
                         html.Li([html.Span(className="public_transport") ,"Public Transport"]),
                         html.Li([html.Span(className="stay_at_home") ,"Stay At Home"]),
-                        html.Li([html.Span(className="movement_restriction") ,"Movement Restriction"]),
                         html.Li([html.Span(className="international_travel") ,"International Travel Restrictions"])
 
 
@@ -369,6 +387,7 @@ app.layout = html.Div(
                                                 #{'label': '', 'value': "Draag_mondkapje_in_ov"},
                                                 {'label': 'Curfew', 'value': "Avondklok"}
                                                 ],
+                                            style=DROP_DOWN_STYLE,
                                             value="Bij_klachten_blijf_thuis"
                                         ),
                                     ],
@@ -424,8 +443,10 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             y=series['series_1'],
             x=dates,
             name= SERIES_NAMES2[series1],
-            line={"color": "#42C4F7"},
+            line={"color": "#f2f2f2"}, 
+            line_width=4,
             mode="lines",
+            showlegend=True
         )
 
     if series2: 
@@ -434,12 +455,16 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
             y=series['series_2'],
             x=dates,
             name=SERIES_NAMES2[series2],
-            line={"color": "#43F7EC"},
+            line={"color": "#42C4F7"},
+            line_width=4,
             mode="lines",
+            showlegend=True
+
         )
     fig = make_subplots(specs=[[{"secondary_y":True}]])
     fig.add_trace(trace1, secondary_y=False)
-    fig.add_trace(trace2, secondary_y=True)
+    if series2:
+        fig.add_trace(trace2, secondary_y=True)
     fig.update_layout(plot_bgcolor=app_color["graph_bg"],
                       paper_bgcolor=app_color["graph_bg"],
                       font={"color": "#fff"},
@@ -482,7 +507,8 @@ def main_graph(series1, sex_series1, transform_1, series2, sex_series2, transfor
                                 y1=y_1,
                                 fillcolor=area['fillcolor'],
                                 opacity=area['opacity'],
-                                line_width=area['line_width']
+                                line_width=area['line_width'],
+                                layer="below"
                             )
 
             y_0_count += 12433 / len(measures)
@@ -504,6 +530,7 @@ def behaviour_plot(behaviour):
         x=df['Date_of_measurement'],
         #line={"color": "#42C4F7"},
         mode="markers",
+        showlegend=False
     )
 
     trace2 = dict(
@@ -512,21 +539,25 @@ def behaviour_plot(behaviour):
         x=df['Date_of_measurement'],
         #line={"color": "#42C4F7"},
         line = dict(width=2, dash='dot'),
+        name=BEHAVIOUR_NAMES[behaviour]
+
     )
 
     layout = dict(
         plot_bgcolor=app_color["graph_bg"],
         paper_bgcolor=app_color["graph_bg"],
         font={"color": "#fff"},
-        height=400,
+        height=500,
+        width=1850,
         xaxis =  {'showgrid': False},
         yaxis={'showgrid': False},
-        showlegend=False,
+        showlegend=True,
         )
 
     fig = go.Figure(data=[trace1, trace2], layout=layout)
 
     fig.update_xaxes(range=[daily_data.loc[0, 'Date_statistics'], daily_data.reset_index(drop=True).loc[len(daily_data)-1, 'Date_statistics']])
+    fig.update_xaxes(showline=True, linecolor="white",linewidth=2)
     fig.update_yaxes(title='Percentage of Positive Respondents')
     fig.update_traces(marker_line_width=2, marker_size=11)
 
