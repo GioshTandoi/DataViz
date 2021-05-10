@@ -31,11 +31,25 @@ MEASURES_COLORS = {
     "c1_school_closing": {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
     "c2_workplace_closing": {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
     "c3_cancel_public_events": {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"},
-    "c4_restrictions_on_gatherings": {1: "#ffcccc", 2: "#ff0000", 3: "#800000",4: "#4d0000"}, #red
+    "c4_restrictions_on_gatherings": {1: "#ffcccc", 2: "#ff9900", 3: "#800000",4: "#4d0000"}, #red
     "c5_close_public_transport": {1: "#99ff99", 2: "#00b300", 3: "#004d00"},
     "c6_stay_at_home_requirements": {1: "#99e6ff", 2: "#00bfff", 3: "#006080"},
     "c7_movement_restriction": {1: "#ecb3ff", 2: "##9900cc", 3: "#4d0066"},
     "c8_international_travel":{1: "##ebebe0", 2: "#c2c2a3", 3: "#7a7a52",4:"#2e2e1f"}
+}
+
+BEHAVIOUR_COLOURS={
+    "Stay Home When Sick":"#99003d",
+    'Keep 1.5m Distance':"#cccc00",
+    "Get Tested When Sick":"#995c00",
+    'Restrict the number of visitors at home':"#4d0000",
+    "Avoid Crowded Spaces":"#004d00",
+    'Wash your hands frequently':"#006080",
+    'Worry about COVID-19':"#4d0066",
+    'Wear face mask in public indoor spaces':"#2e2e1f",
+    'Cough in your elbow':"#00b300",
+    'Work from home as much as possible':"#ff9900",
+    'Curfew':"#ff9900"
 }
 
 MEASURES_NAMES = {
@@ -61,10 +75,9 @@ BEHAVIOUR_NAMES={
     "Hoest_niest_in_elleboog":'Cough in your elbow',
     "Werkt_thuis":'Work from home as much as possible',
     "Avondklok":'Curfew'
-
-
-
 }
+
+
                                         
                                                 
 
@@ -423,7 +436,8 @@ app.layout = html.Div(
                                                 {'label': 'Curfew', 'value': "Avondklok"}
                                                 ],
                                             style=DROP_DOWN_STYLE,
-                                            value="Bij_klachten_blijf_thuis"
+                                            value="Bij_klachten_blijf_thuis",
+                                            multi=True,
                                         ),
                                     ],
                                 ),
@@ -621,27 +635,32 @@ def set_series_2_filter_values(series, filter):
     Output("g2", "figure"), Input('drop-down-4', 'value')
 )
 def behaviour_plot(behaviour):
-    df = behaviour_data.loc[lambda d: d.Indicator == behaviour].sort_values('Date_of_measurement')
+    if not isinstance(behaviour, list):
+        behaviour = [behaviour,]
 
     fig = go.Figure()
 
-    trace1 = dict(
-        type="scatter",
-        y=df['Value'],
-        x=df['Date_of_measurement'],
-        line={"color": "white"},
-        mode="markers",
-        showlegend=False
-    )
+    data = []
 
-    trace2 = dict(
-        type="scatter",
-        y=df['Value'],
-        x=df['Date_of_measurement'],
-        line = dict(width=3, dash='dot', color='white'),
-        name=BEHAVIOUR_NAMES[behaviour]
+    for s in behaviour:
 
-    )
+        df = behaviour_data.loc[lambda d: d.Indicator == s].sort_values('Date_of_measurement')
+        data.append(dict(
+            type="scatter",
+            y=df['Value'],
+            x=df['Date_of_measurement'],
+            line={"color": BEHAVIOUR_COLOURS[BEHAVIOUR_NAMES[s]]},
+            mode="markers",
+            showlegend=False
+        ))
+
+        data.append(dict(
+            type="scatter",
+            y=df['Value'],
+            x=df['Date_of_measurement'],
+            line = dict(width=5, dash='dot', color=BEHAVIOUR_COLOURS[BEHAVIOUR_NAMES[s]]),
+            name=BEHAVIOUR_NAMES[s]
+        ))
 
     layout = dict(
         plot_bgcolor=app_color["graph_bg"],
@@ -654,7 +673,7 @@ def behaviour_plot(behaviour):
         showlegend=True,
         )
 
-    fig = go.Figure(data=[trace1, trace2], layout=layout)
+    fig = go.Figure(data=data, layout=layout)
 
     fig.update_xaxes(range=[daily_data.loc[0, 'Date_statistics'], daily_data.reset_index(drop=True).loc[len(daily_data)-1, 'Date_statistics']])
     fig.update_xaxes(showline=True, linecolor="white",linewidth=2)
