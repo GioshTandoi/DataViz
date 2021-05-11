@@ -31,7 +31,7 @@ MEASURES_COLORS = {
     "c1_school_closing": {1: "#ffb3d1", 2: "#ff0066", 3: "#99003d"},
     "c2_workplace_closing": {1: "#ffffb3", 2: "#ffff00", 3: "#cccc00"},
     "c3_cancel_public_events": {1: "#ffe0b3", 2: "#ff9900", 3: "#995c00"},
-    "c4_restrictions_on_gatherings": {1: "#ffcccc", 2: "#ff9900", 3: "#800000",4: "#4d0000"}, #red
+    "c4_restrictions_on_gatherings": {1: "#ffcccc", 2: "#ff0000", 3: "#800000",4: "#4d0000"}, #red
     "c5_close_public_transport": {1: "#99ff99", 2: "#00b300", 3: "#004d00"},
     "c6_stay_at_home_requirements": {1: "#99e6ff", 2: "#00bfff", 3: "#006080"},
     "c7_movement_restriction": {1: "#ecb3ff", 2: "##9900cc", 3: "#4d0066"},
