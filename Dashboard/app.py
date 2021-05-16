@@ -131,7 +131,7 @@ app.layout = html.Div(
             [
                 html.Div(
                     [
-                        html.H4("CORONA DASHBOARD", className="app__header__title"),
+                        html.H3("THE CORONA POLICY DASHBOARD", className="app__header__title"),
                         html.P(
                             "",
                             className="app__header__title--grey",
@@ -470,10 +470,10 @@ def main_graph(series1, filter_series1, filter_value_series1, transform_1, serie
     filters_1 = {}
     filters_2 = {}
 
-    if filter_value_series1:
+    if filter_series1 and filter_value_series1:
         filters_1[filter_series1] = filter_value_series1
 
-    if filter_value_series2:
+    if filter_series2 and filter_value_series2:
         filters_2[filter_series2] = filter_value_series2
         
     df = daily_data
@@ -649,8 +649,8 @@ def behaviour_plot(behaviour):
             type="scatter",
             y=df['Value'],
             x=df['Date_of_measurement'],
-            line={"color": BEHAVIOUR_COLOURS[BEHAVIOUR_NAMES[s]]},
             mode="markers",
+            line=dict(color='white'),
             showlegend=False
         ))
 
@@ -678,7 +678,7 @@ def behaviour_plot(behaviour):
     fig.update_xaxes(range=[daily_data.loc[0, 'Date_statistics'], daily_data.reset_index(drop=True).loc[len(daily_data)-1, 'Date_statistics']])
     fig.update_xaxes(showline=True, linecolor="white",linewidth=2)
     fig.update_yaxes(title='Percentage of Positive Respondents')
-    fig.update_traces(marker_line_width=2, marker_size=11)
+    fig.update_traces(marker_line_width=2, marker_size=11, marker_line=dict(width=2, color='white'),)
 
     return fig
 

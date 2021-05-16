@@ -89,7 +89,7 @@ data_structure = {
             "Seven Day Average": trans_seven_day_average,
         },
     },
-    "tests": {
+    "Tests": {
         "getter": get_daily_tests,
         "filter": {
             "Region": {
