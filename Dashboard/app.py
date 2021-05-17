@@ -75,10 +75,7 @@ BEHAVIOUR_NAMES={
     "Hoest_niest_in_elleboog":'Cough in your elbow',
     "Werkt_thuis":'Work from home as much as possible',
     "Avondklok":'Curfew'
-}
-
-
-                                        
+}                          
                                                 
 
 SERIES_NAMES = [{'label':'New Cases', 'value':"cases"},
